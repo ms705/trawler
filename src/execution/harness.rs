@@ -87,6 +87,7 @@ where
         tokio::runtime::Builder::new()
             .enable_all()
             .threaded_scheduler()
+            .core_threads(1)
             .on_thread_stop(move || {
                 STATS.with(|my_stats| {
                     let mut stats = stats.lock().unwrap();
