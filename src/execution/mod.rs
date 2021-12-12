@@ -57,17 +57,17 @@ impl Sampler {
         // doesn't have many users), but in general the number of stories is _probably_ fairly
         // independent of scale.
         // TODO: scale this value
-        let votes_per_story = adjust(VOTES_PER_STORY, |n| n);
+        let votes_per_story = adjust(VOTES_PER_STORY, |n| n * scale);
 
         // at 2x the scale, there are probably markedly more comments, but it's unclear that it is
         // quite double.
         // TODO: scale this value
-        let votes_per_comment = adjust(VOTES_PER_COMMENT, |n| n);
+        let votes_per_comment = adjust(VOTES_PER_COMMENT, |n| n * scale);
 
         // the number of stories with N comments probably changes similarly to the number of
         // stories with N votes.
         // TODO: scale this value
-        let comments_per_story = adjust(COMMENTS_PER_STORY, |n| n);
+        let comments_per_story = adjust(COMMENTS_PER_STORY, |n| n * scale);
 
         // NOTE: we _don't_ scale the bin widths belo, since we didn't alter them above.
         Sampler {
