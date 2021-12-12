@@ -206,7 +206,6 @@ where
     let start = time::Instant::now();
     let end = start + runtime;
 
-    let sampler = Sampler::new(load.reqscale);
     let nstories = sampler.nstories();
     let ncomments = sampler.ncomments();
 
