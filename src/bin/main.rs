@@ -283,11 +283,18 @@ fn main() {
         .version("0.1")
         .about("Benchmark a lobste.rs Rails installation")
         .arg(
-            Arg::with_name("scale")
-                .long("scale")
+            Arg::with_name("reqscale")
+                .long("reqscale")
                 .takes_value(true)
                 .default_value("1.0")
-                .help("Scaling factor for workload"),
+                .help("Scaling factor for generated load"),
+        )
+        .arg(
+            Arg::with_name("datascale")
+                .long("datascale")
+                .takes_value(true)
+                .default_value("1.0")
+                .help("Scaling factor for data"),
         )
         .arg(
             Arg::with_name("prime")
@@ -323,7 +330,8 @@ fn main() {
         .get_matches();
 
     let mut wl = trawler::WorkloadBuilder::default();
-    wl.scale(value_t_or_exit!(args, "scale", f64))
+    wl.reqscale(value_t_or_exit!(args, "reqscale", f64))
+        .datascale(value_t_or_exit!(args, "datascale", f64))
         .time(time::Duration::from_secs(value_t_or_exit!(
             args, "runtime", u64
         )));

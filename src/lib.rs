@@ -48,7 +48,8 @@ impl<'a> Default for WorkloadBuilder<'a> {
     fn default() -> Self {
         WorkloadBuilder {
             load: execution::Workload {
-                scale: 1.0,
+                datascale: 1.0,
+                reqscale: 1.0,
 
                 runtime: time::Duration::from_secs(30),
             },
@@ -66,8 +67,16 @@ impl<'a> WorkloadBuilder<'a> {
     /// a total of ~300k comments spread across 9k users. The generated load is on average 44
     /// requests/minute, with a request distribution set according to the one observed on lobste.rs
     /// (see `data/` for details).
-    pub fn scale(&mut self, factor: f64) -> &mut Self {
-        self.load.scale = factor;
+    pub fn reqscale(&mut self, factor: f64) -> &mut Self {
+        self.load.reqscale = factor;
+        self
+    }
+
+    /// Set the data scale factor for the workload
+    ///
+    /// See `reqscale`
+    pub fn datascale(&mut self, factor: f64) -> &mut Self {
+        self.load.datascale = factor;
         self
     }
 
@@ -120,7 +129,7 @@ impl<'a> WorkloadBuilder<'a> {
         // all done!
         println!(
             "# target ops/s: {:.2}",
-            BASE_OPS_PER_MIN as f64 * self.load.scale / 60.0,
+            BASE_OPS_PER_MIN as f64 * self.load.reqscale / 60.0,
         );
         println!("# generated ops/s: {:.2}", generated_per_sec);
         println!("# dropped requests: {}", dropped);

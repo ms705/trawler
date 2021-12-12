@@ -142,7 +142,8 @@ fn id_to_slug(mut id: u32) -> [u8; 6] {
 
 #[derive(Clone, Debug)]
 pub(crate) struct Workload {
-    pub(crate) scale: f64,
+    pub(crate) datascale: f64,
+    pub(crate) reqscale: f64,
     pub(crate) runtime: time::Duration,
 }
 

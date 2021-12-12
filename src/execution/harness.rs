@@ -68,7 +68,7 @@ where
     MS::Response: Send + 'static,
     MS::Service: AsyncShutdown,
 {
-    let target = BASE_OPS_PER_MIN as f64 * load.scale / 60.0;
+    let target = BASE_OPS_PER_MIN as f64 * load.reqscale / 60.0;
 
     // generating a request takes a while because we have to generate random numbers (including
     // zipfs). so, depending on the target load, we may need more than one load generation
@@ -112,7 +112,7 @@ where
     let start = time::Instant::now();
 
     // compute how many of each thing there will be in the database after scaling by mem_scale
-    let sampler = Sampler::new(load.scale);
+    let sampler = Sampler::new(load.datascale);
     let nstories = sampler.nstories();
 
     if prime {
@@ -206,6 +206,7 @@ where
     let start = time::Instant::now();
     let end = start + runtime;
 
+    let sampler = Sampler::new(load.reqscale);
     let nstories = sampler.nstories();
     let ncomments = sampler.ncomments();
 
