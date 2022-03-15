@@ -343,5 +343,6 @@ fn main() {
     wl.run(
         WebClient::new(args.value_of("prefix").unwrap()),
         args.is_present("prime"),
+        std::collections::HashMap::new(),
     );
 }

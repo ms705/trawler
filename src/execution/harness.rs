@@ -7,6 +7,7 @@ use futures_util::stream::StreamExt;
 use rand::distributions::Distribution;
 use rand::{self, Rng};
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::sync::{atomic, Arc, Mutex};
 use std::{mem, time};
 use tower_make::MakeService;
@@ -54,11 +55,21 @@ macro_rules! spawn_call {
     }};
 }
 
+macro_rules! get_or {
+    ($weights:ident, $name:literal, $def:literal) => {
+        match $weights.get($name) {
+            Some(x) => *x,
+            None => $def,
+        }
+    };
+}
+
 pub(crate) fn run<MS>(
     load: execution::Workload,
     in_flight: usize,
     mut client: MS,
     prime: bool,
+    weights: HashMap<String, isize>,
 ) -> (std::time::SystemTime, f64, execution::Stats, usize)
 where
     MS: MakeService<bool, TrawlerRequest>,
@@ -241,33 +252,32 @@ where
         // XXX: we're assuming that users who vote a lot also comment a lot
         // XXX: we're assuming that users who vote a lot also submit many stories
         let user = Some(sampler.user(&mut rng));
-        /*
-        let req = if pick(55842) {
+        let req = if pick(get_or!(weights, "story", 55842)) {
             // XXX: we're assuming here that stories with more votes are viewed more
             LobstersRequest::Story(id_to_slug(sampler.story_for_vote(&mut rng)))
-        } else if pick(30105) {
+        } else if pick(get_or!(weights, "story", 30105)) {
             LobstersRequest::Frontpage
-        } else if pick(6702) {
+        } else if pick(get_or!(weights, "story", 6702)) {
             // XXX: we're assuming that users who vote a lot are also "popular"
             LobstersRequest::User(sampler.user(&mut rng))
-        } else if pick(4674) {
+        } else if pick(get_or!(weights, "story", 4674)) {
             LobstersRequest::Comments
-        } else if pick(967) {
+        } else if pick(get_or!(weights, "story", 967)) {
             LobstersRequest::Recent
-        } else if pick(630) {
+        } else if pick(get_or!(weights, "story", 630)) {
             LobstersRequest::CommentVote(id_to_slug(sampler.comment_for_vote(&mut rng)), Vote::Up)
-        } else if pick(475) {
+        } else if pick(get_or!(weights, "story", 475)) {
             LobstersRequest::StoryVote(id_to_slug(sampler.story_for_vote(&mut rng)), Vote::Up)
-        } else if pick(316) {
+        } else if pick(get_or!(weights, "story", 316)) {
             // comments without a parent
             LobstersRequest::Comment {
                 id: id_to_slug(rng.gen_range(ncomments, MAX_SLUGGABLE_ID)),
                 story: id_to_slug(sampler.story_for_comment(&mut rng)),
                 parent: None,
             }
-        } else if pick(87) {
+        } else if pick(get_or!(weights, "story", 87)) {
             LobstersRequest::Login
-        } else if pick(71) {
+        } else if pick(get_or!(weights, "story", 71)) {
             // comments with a parent
             let id = rng.gen_range(ncomments, MAX_SLUGGABLE_ID);
             let story = sampler.story_for_comment(&mut rng);
@@ -280,22 +290,20 @@ where
                 story: id_to_slug(story),
                 parent: Some(id_to_slug(parent)),
             }
-        } else if pick(54) {
+        } else if pick(get_or!(weights, "story", 54)) {
             LobstersRequest::CommentVote(id_to_slug(sampler.comment_for_vote(&mut rng)), Vote::Down)
-        } else if pick(53) {
+        } else if pick(get_or!(weights, "story", 53)) {
             let id = rng.gen_range(nstories, MAX_SLUGGABLE_ID);
             LobstersRequest::Submit {
                 id: id_to_slug(id),
                 title: format!("benchmark {}", id),
             }
-        } else if pick(21) {
+        } else if pick(get_or!(weights, "story", 21)) {
             LobstersRequest::StoryVote(id_to_slug(sampler.story_for_vote(&mut rng)), Vote::Down)
         } else {
             // ~.003%
             LobstersRequest::Logout
         };
-        */
-        let req = LobstersRequest::Logout;
 
         _nissued += 1;
         ops += 1;

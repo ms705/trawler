@@ -113,8 +113,12 @@ impl<'a> WorkloadBuilder<'a> {
     /// The provided client must be able to (asynchronously) create a `Service<TrawlerRequest>`. To
     /// do so, it must implement `Service<bool>`, where the boolean parameter indicates whether
     /// the database is also scheduled to be primed before the workload begins.
-    pub fn run<MS>(&self, client: MS, prime: bool)
-    where
+    pub fn run<MS>(
+        &self,
+        client: MS,
+        prime: bool,
+        weights: std::collections::HashMap<String, isize>,
+    ) where
         MS: tower_make::MakeService<bool, client::TrawlerRequest>,
         MS::MakeError: std::fmt::Debug,
         <MS::Service as tower_service::Service<client::TrawlerRequest>>::Future: Send + 'static,
@@ -123,8 +127,13 @@ impl<'a> WorkloadBuilder<'a> {
         MS::Service: client::AsyncShutdown,
     {
         // actually run the workload
-        let (start, generated_per_sec, timing, dropped) =
-            execution::harness::run(self.load.clone(), self.max_in_flight, client, prime);
+        let (start, generated_per_sec, timing, dropped) = execution::harness::run(
+            self.load.clone(),
+            self.max_in_flight,
+            client,
+            prime,
+            weights,
+        );
 
         // all done!
         println!(
