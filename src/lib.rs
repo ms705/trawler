@@ -28,6 +28,7 @@ pub use self::client::{CommentId, StoryId, UserId};
 mod execution;
 mod timing;
 
+use std::collections::HashMap;
 use std::fs;
 use std::time;
 
@@ -113,12 +114,8 @@ impl<'a> WorkloadBuilder<'a> {
     /// The provided client must be able to (asynchronously) create a `Service<TrawlerRequest>`. To
     /// do so, it must implement `Service<bool>`, where the boolean parameter indicates whether
     /// the database is also scheduled to be primed before the workload begins.
-    pub fn run<MS>(
-        &self,
-        client: MS,
-        prime: bool,
-        weights: std::collections::HashMap<String, isize>,
-    ) where
+    pub fn run<MS>(&self, client: MS, prime: bool, weights: &HashMap<String, isize>)
+    where
         MS: tower_make::MakeService<bool, client::TrawlerRequest>,
         MS::MakeError: std::fmt::Debug,
         <MS::Service as tower_service::Service<client::TrawlerRequest>>::Future: Send + 'static,

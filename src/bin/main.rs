@@ -15,6 +15,10 @@ use std::task::{Context, Poll};
 use std::time;
 
 lazy_static! {
+    static ref WEIGHTS: HashMap<String, isize> = HashMap::new();
+}
+
+lazy_static! {
     static ref SESSION_COOKIES: RwLock<HashMap<u32, cookie::CookieJar>> = RwLock::default();
 }
 
@@ -343,6 +347,6 @@ fn main() {
     wl.run(
         WebClient::new(args.value_of("prefix").unwrap()),
         args.is_present("prime"),
-        std::collections::HashMap::new(),
+        &WEIGHTS,
     );
 }
