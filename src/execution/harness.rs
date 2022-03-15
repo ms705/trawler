@@ -241,6 +241,7 @@ where
         // XXX: we're assuming that users who vote a lot also comment a lot
         // XXX: we're assuming that users who vote a lot also submit many stories
         let user = Some(sampler.user(&mut rng));
+        /*
         let req = if pick(55842) {
             // XXX: we're assuming here that stories with more votes are viewed more
             LobstersRequest::Story(id_to_slug(sampler.story_for_vote(&mut rng)))
@@ -293,6 +294,8 @@ where
             // ~.003%
             LobstersRequest::Logout
         };
+        */
+        let req = LobstersRequest::Logout;
 
         _nissued += 1;
         ops += 1;
