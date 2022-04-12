@@ -70,6 +70,7 @@ pub(crate) fn run<MS>(
     mut client: MS,
     prime: bool,
     weights: &HashMap<String, isize>,
+    scale_everything: bool,
 ) -> (std::time::SystemTime, f64, execution::Stats, usize)
 where
     MS: MakeService<bool, TrawlerRequest>,
@@ -123,7 +124,7 @@ where
     let start = time::Instant::now();
 
     // compute how many of each thing there will be in the database after scaling by mem_scale
-    let sampler = Sampler::new(load.datascale);
+    let sampler = Sampler::new(load.datascale, scale_everything);
     let nstories = sampler.nstories();
 
     if prime {

@@ -306,6 +306,11 @@ fn main() {
                 .help("Set if the backend must be primed with initial stories and comments."),
         )
         .arg(
+            Arg::with_name("scale_everything")
+                .long("scale_everything")
+                .help("Set if you want to scale the data per user with the number of users."),
+        )
+        .arg(
             Arg::with_name("runtime")
                 .short("r")
                 .long("runtime")
@@ -348,5 +353,6 @@ fn main() {
         WebClient::new(args.value_of("prefix").unwrap()),
         args.is_present("prime"),
         &WEIGHTS,
+        args.is_present("scale_everything"),
     );
 }

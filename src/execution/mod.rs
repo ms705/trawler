@@ -17,7 +17,7 @@ struct Sampler {
 
 use rand;
 impl Sampler {
-    fn new(scale: f64) -> Self {
+    fn new(scale: f64, scale_everything: bool) -> Self {
         fn adjust<'a, F>(
             hist: &'static [(usize, usize)],
             f: F,
@@ -52,22 +52,23 @@ impl Sampler {
         // each vote count bin, we want there to be f times more users.
         let votes_per_user = adjust(VOTES_PER_USER, |n| n * scale);
 
+        let oscale = if scale_everything { scale } else { 1 as f64 };
         // at 2x scale, it is not clear that there are 2x as many stories with a given vote count.
         // there is probably a weak correlation with scale (a tiny site with 2 users probably
         // doesn't have many users), but in general the number of stories is _probably_ fairly
         // independent of scale.
         // TODO: scale this value
-        let votes_per_story = adjust(VOTES_PER_STORY, |n| n * scale);
+        let votes_per_story = adjust(VOTES_PER_STORY, |n| n * oscale);
 
         // at 2x the scale, there are probably markedly more comments, but it's unclear that it is
         // quite double.
         // TODO: scale this value
-        let votes_per_comment = adjust(VOTES_PER_COMMENT, |n| n * scale);
+        let votes_per_comment = adjust(VOTES_PER_COMMENT, |n| n * oscale);
 
         // the number of stories with N comments probably changes similarly to the number of
         // stories with N votes.
         // TODO: scale this value
-        let comments_per_story = adjust(COMMENTS_PER_STORY, |n| n * scale);
+        let comments_per_story = adjust(COMMENTS_PER_STORY, |n| n * oscale);
 
         // NOTE: we _don't_ scale the bin widths belo, since we didn't alter them above.
         Sampler {
